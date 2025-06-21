@@ -1,0 +1,23 @@
+<!-- src/main/resources/templates/email/appointment-alert.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rappel de Rendez-vous</title>
+</head>
+<body>
+<h2>Bonjour <span th:text="${username}">User</span>,</h2>
+<p>
+    Ceci est un rappel concernant votre rendez-vous :<br>
+    <b>Date :</b> <span th:text="${appointmentDate}"></span><br>
+    <b>Heure :</b> <span th:text="${appointmentTime}"></span><br>
+    <b>Médecin :</b> <span th:text="${doctorName}"></span>
+</p>
+<p>
+    Merci d’arriver quelques minutes à l’avance.<br>
+    Pour toute question, contactez-nous à <span th:text="${supportEmail}">support@cabinet360.com</span>.
+</p>
+<hr>
+<p style="font-size:small;color:gray">Cet email a été généré automatiquement. Merci de ne pas répondre.</p>
+</body>
+</html>

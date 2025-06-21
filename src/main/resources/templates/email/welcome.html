@@ -1,0 +1,20 @@
+<!-- src/main/resources/templates/email/welcome.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome!</title>
+</head>
+<body>
+<h2>Bienvenue sur Cabinet360, <span th:text="${username}">User</span> !</h2>
+<p>
+    Nous sommes ravis de vous compter parmi nos utilisateurs.<br>
+    Accédez à votre espace pour gérer vos rendez-vous, consulter vos dossiers, et bien plus encore.
+</p>
+<p>
+    <a th:href="${dashboardUrl}">Accéder à mon espace Cabinet360</a>
+</p>
+<hr>
+<p style="font-size:small;color:gray">Cet email a été généré automatiquement. Merci de ne pas répondre.</p>
+</body>
+</html>

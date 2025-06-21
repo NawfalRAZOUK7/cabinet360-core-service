@@ -1,0 +1,21 @@
+# Maven
+/target
+*.jar
+*.war
+
+# IntelliJ
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+
+# Secrets
+.env
+!.env.template
+
+# Logs
+*.log

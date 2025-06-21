@@ -1,0 +1,2324 @@
+{
+  "info": {
+    "_postman_id": "cabinet360-core-service-collection-v2",
+    "name": "Cabinet360 Core-Service API Collection",
+    "description": "Complete API collection for Cabinet360 core-service with JWT authentication, role-based access control, and comprehensive medical management endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "cabinet360-team"
+  },
+  "item": [
+    {
+      "name": "🏥 Cabinet Management",
+      "item": [
+        {
+          "name": "Create Cabinet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ownerDoctorId\": {{doctorId}},\n  \"cabinetName\": \"Cabinet Dr. Martin\",\n  \"description\": \"Cabinet de médecine générale spécialisé en cardiologie\",\n  \"businessLicense\": \"LICENSE-2024-001\",\n  \"status\": \"ACTIVE\",\n  \"settings\": {\n    \"defaultAppointmentDuration\": 30,\n    \"workingDays\": \"MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY\",\n    \"workingHoursStart\": \"08:00\",\n    \"workingHoursEnd\": \"18:00\",\n    \"allowOnlineBooking\": true,\n    \"maxPatientsPerDay\": 20,\n    \"advanceBookingDays\": 30,\n    \"requirePatientConfirmation\": true,\n    \"sendReminders\": true,\n    \"reminderHoursBefore\": 24,\n    \"emergencyContact\": \"+33-1-23-45-67-89\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has cabinet data\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('cabinetName');",
+                  "    pm.expect(jsonData.cabinetName).to.eql('Cabinet Dr. Martin');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('cabinetId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Cabinet by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/{{cabinetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "{{cabinetId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cabinets by Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/doctor/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "doctor", "{{doctorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cabinet",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cabinetName\": \"Cabinet Dr. Martin - Cardiologie\",\n  \"description\": \"Cabinet spécialisé en cardiologie et médecine interne\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/{{cabinetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "{{cabinetId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cabinet Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/{{cabinetId}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "{{cabinetId}}", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Cabinets by Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/search?name=Martin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "search"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Martin"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📅 Appointments (RendezVous)",
+      "item": [
+        {
+          "name": "Create Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientUserId\": {{patientId}},\n  \"medecinUserId\": {{doctorId}},\n  \"dateHeure\": \"2024-06-21T14:30:00\",\n  \"statut\": \"EN_ATTENTE\",\n  \"dureeMinutes\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Check for scheduling conflicts\", function () {",
+                  "    if (pm.response.code === 409) {",
+                  "        pm.test(\"Conflict detected\", function () {",
+                  "            pm.expect(pm.response.headers.get('X-Error-Type')).to.eql('SCHEDULING_CONFLICT');",
+                  "        });",
+                  "    }",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('appointmentId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Appointment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/{{appointmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "{{appointmentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Appointments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointments by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "patient", "{{patientId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointments by Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/doctor/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "doctor", "{{doctorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointments by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/status/CONFIRME",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "status", "CONFIRME"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointments by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/date/2024-06-21T00:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "date", "2024-06-21T00:00:00"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Today's Appointments for Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/doctor/{{doctorId}}/today",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "doctor", "{{doctorId}}", "today"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Upcoming Appointments for Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/patient/{{patientId}}/upcoming",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "patient", "{{patientId}}", "upcoming"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Scheduling Conflicts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientUserId\": {{patientId}},\n  \"medecinUserId\": {{doctorId}},\n  \"dateHeure\": \"2024-06-21T15:00:00\",\n  \"dureeMinutes\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/check-conflicts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "check-conflicts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Time Slots",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/doctor/{{doctorId}}/available-slots?date=2024-06-21&duration=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "doctor", "{{doctorId}}", "available-slots"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-06-21"
+                },
+                {
+                  "key": "duration",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateHeure\": \"2024-06-21T15:30:00\",\n  \"statut\": \"CONFIRME\",\n  \"dureeMinutes\": 45\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/{{appointmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "{{appointmentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/{{appointmentId}}/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "{{appointmentId}}", "confirm"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/{{appointmentId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "{{appointmentId}}", "cancel"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointment Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "stats"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📋 Medical Records",
+      "item": [
+        {
+          "name": "Create Medical Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientUserId\": {{patientId}},\n  \"medecinUserId\": {{doctorId}},\n  \"medecinsAutorisesIds\": [{{doctorId}}],\n  \"resumeHistorique\": \"Patient de 45 ans, antécédents d'hypertension artérielle, sous traitement ACE inhibiteur. Consultation de routine pour suivi cardiologique.\",\n  \"statut\": \"ACTIF\",\n  \"commentaires\": \"Dossier créé suite à première consultation cardiologique\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dossiers-medicaux",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dossiers-medicaux"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('dossierMedicalId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Medical Record by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dossiers-medicaux/{{dossierMedicalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dossiers-medicaux", "{{dossierMedicalId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Medical Records by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dossiers-medicaux/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dossiers-medicaux", "patient", "{{patientId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Medical Records by Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dossiers-medicaux/doctor/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dossiers-medicaux", "doctor", "{{doctorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Complete Patient Record",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dossiers-medicaux/patient/{{patientId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dossiers-medicaux", "patient", "{{patientId}}", "complete"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Medical Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resumeHistorique\": \"Patient de 45 ans, antécédents d'hypertension artérielle contrôlée sous ACE inhibiteur. Ajout de bêta-bloquant suite à dernière consultation. Bon contrôle tensionnel.\",\n  \"statut\": \"ACTIF\",\n  \"commentaires\": \"Mise à jour suite à consultation de contrôle - ajustement thérapeutique\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dossiers-medicaux/{{dossierMedicalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dossiers-medicaux", "{{dossierMedicalId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🧪 Medical Analysis",
+      "item": [
+        {
+          "name": "Create Analysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeAnalyse\": \"Analyse sanguine complète\",\n  \"resultat\": \"Hémoglobine: 14.2 g/dL (normal)\\nGlobules blancs: 7200/µL (normal)\\nPlaquettes: 280000/µL (normal)\\nGlycémie: 0.92 g/L (normal)\",\n  \"dateAnalyse\": \"2024-06-20T10:30:00\",\n  \"dossierMedicalId\": {{dossierMedicalId}},\n  \"patientUserId\": {{patientId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('analyseId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Analysis by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/{{analyseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "{{analyseId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Analyses by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "patient", "{{patientId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recent Analyses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/recent?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "recent"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Analyses by Type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/search?type=sanguine",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "search"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "sanguine"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Analysis",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeAnalyse\": \"Analyse sanguine complète - Suivi\",\n  \"resultat\": \"Hémoglobine: 14.5 g/dL (normal)\\nGlobules blancs: 6800/µL (normal)\\nPlaquettes: 290000/µL (normal)\\nGlycémie: 0.89 g/L (normal)\\nCholestérol total: 1.85 g/L (normal)\",\n  \"dateAnalyse\": \"2024-06-20T10:30:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/{{analyseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "{{analyseId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Analysis",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/{{analyseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "{{analyseId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📁 Document Management",
+      "item": [
+        {
+          "name": "Create Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Radio thoracique - Consultation du 20/06/2024\",\n  \"url\": \"https://storage.cabinet360.com/documents/radio-thorax-20240620.pdf\",\n  \"typeDocument\": \"RADIOGRAPHIE\",\n  \"dateUpload\": \"2024-06-20T14:30:00\",\n  \"dossierMedicalId\": {{dossierMedicalId}},\n  \"patientUserId\": {{patientId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('documentId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Document File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "dossierMedicalId",
+                  "value": "{{dossierMedicalId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "patientUserId",
+                  "value": "{{patientId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "typeDocument",
+                  "value": "RAPPORT_MEDICAL",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents", "upload"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Document by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents/{{documentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents", "{{documentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Documents by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents", "patient", "{{patientId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Documents by Type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents/type/RADIOGRAPHIE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents", "type", "RADIOGRAPHIE"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Documents Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"nom\": \"ECG - Consultation du 20/06/2024\",\n    \"url\": \"https://storage.cabinet360.com/documents/ecg-20240620.pdf\",\n    \"typeDocument\": \"ECG\",\n    \"dateUpload\": \"2024-06-20T15:00:00\",\n    \"dossierMedicalId\": {{dossierMedicalId}},\n    \"patientUserId\": {{patientId}}\n  },\n  {\n    \"nom\": \"Rapport échographie cardiaque\",\n    \"url\": \"https://storage.cabinet360.com/documents/echo-card-20240620.pdf\",\n    \"typeDocument\": \"ECHOGRAPHIE\",\n    \"dateUpload\": \"2024-06-20T15:15:00\",\n    \"dossierMedicalId\": {{dossierMedicalId}},\n    \"patientUserId\": {{patientId}}\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents/batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents", "batch"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📝 Medical Notes",
+      "item": [
+        {
+          "name": "Create Medical Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenu\": \"Patient présente une tension artérielle stable à 130/80 mmHg. ECG normal. Recommandation de poursuivre le traitement actuel. Prochain contrôle dans 3 mois. Patient informé des signes d'alerte à surveiller.\",\n  \"dateNote\": \"2024-06-20T16:00:00\",\n  \"medecinUserId\": {{doctorId}},\n  \"dossierMedicalId\": {{dossierMedicalId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('noteId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Medical Note by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "{{noteId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notes by Medical Record",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/dossier/{{dossierMedicalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "dossier", "{{dossierMedicalId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notes by Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/doctor/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "doctor", "{{doctorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Notes by Content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/search?content=tension",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "search"],
+              "query": [
+                {
+                  "key": "content",
+                  "value": "tension"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Medical Note",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenu\": \"Patient présente une tension artérielle bien contrôlée à 125/75 mmHg. ECG normal sans anomalie. Bon observance thérapeutique. Recommandation de poursuivre le traitement actuel avec lisinopril 10mg/j. Prochain contrôle dans 3 mois. Patient sensibilisé à l'importance du régime hyposodé.\",\n  \"dateNote\": \"2024-06-20T16:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "{{noteId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Medical Note",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "{{noteId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💊 Prescriptions",
+      "item": [
+        {
+          "name": "Create Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenu\": \"1. Lisinopril 10mg - 1 comprimé par jour le matin à jeun\\n2. Amlodipine 5mg - 1 comprimé par jour le soir\\n3. Aspirine 75mg - 1 comprimé par jour au cours du repas\\n\\nDurée du traitement: 3 mois\\nRendez-vous de contrôle: dans 3 mois\\nSurveillance: Tension artérielle, fonction rénale\",\n  \"dateOrdonnance\": \"2024-06-20T16:30:00\",\n  \"medecinUserId\": {{doctorId}},\n  \"patientUserId\": {{patientId}},\n  \"dossierMedicalId\": {{dossierMedicalId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('prescriptionId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Prescription by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions/{{prescriptionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions", "{{prescriptionId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Prescriptions by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions", "patient", "{{patientId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Prescriptions by Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions/doctor/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions", "doctor", "{{doctorId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recent Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions/recent?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions", "recent"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions/search?medication=Lisinopril",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions", "search"],
+              "query": [
+                {
+                  "key": "medication",
+                  "value": "Lisinopril"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Prescription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenu\": \"1. Lisinopril 10mg - 1 comprimé par jour le matin à jeun\\n2. Amlodipine 5mg - 1 comprimé par jour le soir\\n3. Aspirine 75mg - 1 comprimé par jour au cours du repas\\n4. Atorvastatine 20mg - 1 comprimé le soir (AJOUT)\\n\\nDurée du traitement: 3 mois\\nRendez-vous de contrôle: dans 3 mois\\nSurveillance: Tension artérielle, fonction rénale, bilan lipidique\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/prescriptions/{{prescriptionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "prescriptions", "{{prescriptionId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📢 Notifications",
+      "item": [
+        {
+          "name": "Send Email Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"EMAIL\",\n  \"recipient\": \"patient@example.com\",\n  \"subject\": \"Rappel de rendez-vous - Cabinet Dr. Martin\",\n  \"message\": \"Bonjour,\\n\\nNous vous rappelons votre rendez-vous prévu demain à 14h30 avec le Dr. Martin.\\n\\nMerci de confirmer votre présence.\\n\\nCordialement,\\nL'équipe du Cabinet Dr. Martin\",\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send SMS Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"SMS\",\n  \"recipient\": \"+33123456789\",\n  \"message\": \"Rappel RDV demain 14h30 Cabinet Dr Martin. Confirmez par SMS ou appelez 01.23.45.67.89\",\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Push Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PUSH\",\n  \"recipient\": \"user-device-token-123\",\n  \"title\": \"Rappel de rendez-vous\",\n  \"message\": \"Votre RDV avec Dr. Martin est prévu demain à 14h30\",\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send In-App Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"IN_APP\",\n  \"recipient\": \"{{patientId}}\",\n  \"title\": \"Nouveaux résultats d'analyse\",\n  \"message\": \"Vos résultats d'analyse sanguine sont disponibles dans votre dossier médical.\",\n  \"status\": \"UNREAD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Immediate Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"EMAIL\",\n  \"recipient\": \"urgence@example.com\",\n  \"subject\": \"URGENT - Alerte médicale\",\n  \"message\": \"Alerte médicale pour patient ID {{patientId}}. Intervention immédiate requise.\",\n  \"status\": \"PENDING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/send/immediate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "send", "immediate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/status/PENDING",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "status", "PENDING"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications by Type",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/type/EMAIL",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "type", "EMAIL"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/{{notificationId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "{{notificationId}}", "read"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notification Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "stats"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔗 Patient-Cabinet Links",
+      "item": [
+        {
+          "name": "Create Simple Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/simple?patientUserId={{patientId}}&cabinetId={{cabinetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "simple"],
+              "query": [
+                {
+                  "key": "patientUserId",
+                  "value": "{{patientId}}"
+                },
+                {
+                  "key": "cabinetId",
+                  "value": "{{cabinetId}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('linkId', responseJson.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Detailed Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientUserId\": {{patientId}},\n  \"cabinetId\": {{cabinetId}},\n  \"status\": \"ACTIVE\",\n  \"linkedAt\": \"2024-06-20T10:00:00\",\n  \"lastAccessAt\": \"2024-06-20T16:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Link by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/{{linkId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "{{linkId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Link",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/patient/{{patientId}}/cabinet/{{cabinetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "patient", "{{patientId}}", "cabinet", "{{cabinetId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Links by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "patient", "{{patientId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Links by Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/patient/{{patientId}}/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "patient", "{{patientId}}", "active"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Links by Cabinet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/cabinet/{{cabinetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "cabinet", "{{cabinetId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Link Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/{{linkId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "{{linkId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Link",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/patient-cabinet-links/{{linkId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "patient-cabinet-links", "{{linkId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "❌ Error Scenarios",
+      "item": [
+        {
+          "name": "Unauthorized Access - No Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forbidden Access - Wrong Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{patientToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cabinetName\": \"Unauthorized Cabinet\",\n  \"ownerDoctorId\": 999\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Data - Missing Required Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"typeAnalyse\": \"\",\n  \"resultat\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resource Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "99999"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 Not Found\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Scheduling Conflict",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientUserId\": {{patientId}},\n  \"medecinUserId\": {{doctorId}},\n  \"dateHeure\": \"2024-06-21T14:30:00\",\n  \"statut\": \"EN_ATTENTE\",\n  \"dureeMinutes\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409 Conflict\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test(\"Conflict header present\", function () {",
+                  "    pm.expect(pm.response.headers.get('X-Error-Type')).to.eql('SCHEDULING_CONFLICT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔧 Utility & Health Checks",
+      "item": [
+        {
+          "name": "Cabinet Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cabinets/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cabinets", "health"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Service is UP\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('UP');",
+                  "    pm.expect(jsonData.service).to.eql('CabinetService');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notification Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Analysis Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Appointment Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rendez-vous/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rendez-vous", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notification Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/types",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "types"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notification Statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/statuses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "statuses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Analysis Types Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/analyses/types/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "analyses", "types", "summary"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set timestamps for requests that need them",
+          "const now = new Date().toISOString();",
+          "pm.globals.set('currentDateTime', now);",
+          "",
+          "// Validate required environment variables",
+          "const requiredVars = ['baseUrl', 'token'];",
+          "requiredVars.forEach(varName => {",
+          "    if (!pm.environment.get(varName)) {",
+          "        console.warn(`⚠️ Missing environment variable: ${varName}`);",
+          "    }",
+          "});",
+          "",
+          "// Set default values if missing",
+          "if (!pm.environment.get('doctorId')) {",
+          "    pm.environment.set('doctorId', '1');",
+          "}",
+          "if (!pm.environment.get('patientId')) {",
+          "    pm.environment.set('patientId', '2');",
+          "}",
+          "if (!pm.environment.get('assistantId')) {",
+          "    pm.environment.set('assistantId', '3');",
+          "}",
+          "if (!pm.environment.get('adminId')) {",
+          "    pm.environment.set('adminId', '4');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global response time test",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "// Global content type test for JSON endpoints",
+          "if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
+          "    pm.test('Response is valid JSON', function () {",
+          "        pm.response.to.be.json;",
+          "    });",
+          "}",
+          "",
+          "// Log response for debugging in development",
+          "if (pm.environment.get('DEV_MODE') === 'true') {",
+          "    console.log('Response Status:', pm.response.status);",
+          "    console.log('Response Body:', pm.response.text());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token for authentication"
+    },
+    {
+      "key": "doctorId",
+      "value": "1",
+      "type": "string",
+      "description": "Doctor user ID for testing"
+    },
+    {
+      "key": "patientId",
+      "value": "2",
+      "type": "string",
+      "description": "Patient user ID for testing"
+    },
+    {
+      "key": "assistantId",
+      "value": "3",
+      "type": "string",
+      "description": "Assistant user ID for testing"
+    },
+    {
+      "key": "adminId",
+      "value": "4",
+      "type": "string",
+      "description": "Admin user ID for testing"
+    },
+    {
+      "key": "cabinetId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after cabinet creation"
+    },
+    {
+      "key": "dossierMedicalId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after medical record creation"
+    },
+    {
+      "key": "analyseId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after analysis creation"
+    },
+    {
+      "key": "documentId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after document creation"
+    },
+    {
+      "key": "noteId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after note creation"
+    },
+    {
+      "key": "prescriptionId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after prescription creation"
+    },
+    {
+      "key": "appointmentId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after appointment creation"
+    },
+    {
+      "key": "linkId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after patient-cabinet link creation"
+    },
+    {
+      "key": "notificationId",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated after notification creation"
+    },
+    {
+      "key": "patientToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token for patient user (for testing authorization)"
+    }
+  ]
+}
