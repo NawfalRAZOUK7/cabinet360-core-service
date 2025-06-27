@@ -147,9 +147,9 @@
 
         <!-- Migration de base de données -->
         <dependency>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-core</artifactId>
-                <optional>true</optional>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Outils et utilitaires -->
@@ -240,12 +240,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                        <excludes>
-                            <exclude>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-devtools</artifactId>
-                            </exclude>
-                        </excludes>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-devtools</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
