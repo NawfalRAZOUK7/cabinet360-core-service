@@ -1,0 +1,313 @@
+# ==========================================
+# Cabinet360 Core Service Configuration
+# ==========================================
+
+# ---------------------------
+# Application Configuration
+# ---------------------------
+app:
+  name: Cabinet360 Core Service
+  version: 1.0.0
+
+# ---------------------------
+# Server Configuration
+# ---------------------------
+server:
+  port: ${PORT:8080}
+
+# ---------------------------
+# Spring Configuration
+# ---------------------------
+spring:
+  # Profil actif par défaut
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # Configuration de la base de données
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cabinet360_core}
+    username: ${DB_USERNAME:cabinet360_user}
+    password: ${DB_PASSWORD:cabinet360_pass}
+    driver-class-name: org.postgresql.Driver
+
+  # Configuration JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update}
+
+    show-sql: ${SHOW_SQL:true}
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        generate_statistics: false
+
+        # Configuration pour PostgreSQL
+        jdbc:
+          time_zone: Europe/Paris
+
+        # Optimisations
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+    # Stratégie de nommage des tables/colonnes
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+
+  # Configuration Email
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    from: ${SPRING_MAIL_FROM:noreply@cabinet360.com}
+    properties:
+      mail:
+        smtp:
+          auth: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}
+
+  # Configuration Liquibase (optionnel)
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:false}
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+# ---------------------------
+# Logging Configuration
+# ---------------------------
+logging:
+  level:
+    org.hibernate.SQL: ${LOG_SQL:DEBUG}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_SQL_PARAMS:TRACE}
+    com.cabinet360.core: DEBUG
+    root: ${LOG_LEVEL:INFO}
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+  file:
+    name: ${LOG_FILE:./logs/core-service.log}
+
+# ---------------------------
+# JWT Configuration
+# ---------------------------
+jwt:
+  secret: ${JWT_SECRET:cabinet360supersecurekeymustbeatleast32chars!}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# ---------------------------
+# Microservices URLs
+# ---------------------------
+auth:
+  service:
+    url: ${AUTH_SERVICE_URL:http://auth-service:8080}
+
+# ---------------------------
+# CORS Configuration
+# ---------------------------
+cors:
+  origin: ${CORS_ORIGIN:http://localhost:4200,http://localhost:3000}
+
+# ---------------------------
+# Admin Configuration
+# ---------------------------
+admin:
+  email: ${ADMIN_EMAIL:admin@cabinet360.com}
+  password: ${ADMIN_PASSWORD:NawfalAdmin2025!}
+
+# ---------------------------
+# Support Configuration
+# ---------------------------
+support:
+  email: ${SUPPORT_EMAIL:support@cabinet360.com}
+
+# ---------------------------
+# Notification Configuration
+# ---------------------------
+notification:
+  batch:
+    size: ${NOTIFICATION_BATCH_SIZE:50}
+
+email:
+  batch:
+    delay: ${EMAIL_BATCH_DELAY:1000}
+
+sms:
+  batch:
+    delay: ${SMS_BATCH_DELAY:1000}
+
+# ---------------------------
+# SMS (Twilio) Configuration
+# ---------------------------
+twilio:
+  account:
+    sid: ${TWILIO_ACCOUNT_SID:}
+  auth:
+    token: ${TWILIO_AUTH_TOKEN:}
+  phone:
+    number: ${TWILIO_PHONE_NUMBER:}
+  enabled: ${TWILIO_ENABLED:true}
+
+---
+# ==========================================
+# PROFIL DE DÉVELOPPEMENT
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # Base de données de développement
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cabinet360_core_dev}
+    username: ${DB_USERNAME:cabinet360_user}
+    password: ${DB_PASSWORD:cabinet360_pass}
+
+  # JPA pour développement
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+# Logging pour développement
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.cabinet360.core: DEBUG
+    root: DEBUG
+
+---
+# ==========================================
+# PROFIL DE TEST
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # Base de données en mémoire pour tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # JPA pour tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+
+  # H2 Console (pour débuggage des tests)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Logging pour tests
+logging:
+  level:
+    org.hibernate.SQL: WARN
+    com.cabinet360.core: INFO
+    root: WARN
+
+# Configuration de test
+jwt:
+  secret: testsecretkey32characterslongfortest
+  expiration: 3600000
+
+---
+# ==========================================
+# PROFIL DE PRODUCTION
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # Base de données de production
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+    # Configuration HikariCP pour production
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  # JPA pour production
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        generate_statistics: false
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+# Logging pour production
+logging:
+  level:
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    com.cabinet360.core: INFO
+    root: WARN
+  file:
+    name: /var/log/cabinet360/core-service.log
+
+# Configuration de sécurité pour production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+
+---
+# ==========================================
+# PROFIL DE STAGING (OPTIONNEL)
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+  # Base de données de staging
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:staging-db}:${DB_PORT:5432}/${DB_NAME:cabinet360_core_staging}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  # JPA pour staging
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+# Logging pour staging
+logging:
+  level:
+    org.hibernate.SQL: INFO
+    com.cabinet360.core: DEBUG
+    root: INFO
