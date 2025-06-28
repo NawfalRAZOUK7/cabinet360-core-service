@@ -60,10 +60,14 @@ public interface NoteMedicaleRepository extends JpaRepository<NoteMedicale, Long
     List<NoteMedicale> findRecentNotesByMedecin(@Param("medecinId") Long medecinUserId);
 
     /**
-     * ✅ Added: Find notes created today by medecin
+     * ✅ FIXED: Corrected today's notes query - using LocalDateTime comparison instead of DATE() function
+     * The previous query used DATE() function which caused type mismatch between java.lang.Object and java.sql.Date
      */
-    @Query("SELECT n FROM NoteMedicale n WHERE n.medecinUserId = :medecinId AND DATE(n.dateNote) = CURRENT_DATE")
-    List<NoteMedicale> findTodayNotesByMedecin(@Param("medecinId") Long medecinUserId);
+    @Query("SELECT n FROM NoteMedicale n WHERE n.medecinUserId = :medecinId " +
+            "AND n.dateNote >= :startOfDay AND n.dateNote < :endOfDay")
+    List<NoteMedicale> findTodayNotesByMedecin(@Param("medecinId") Long medecinUserId,
+                                               @Param("startOfDay") LocalDateTime startOfDay,
+                                               @Param("endOfDay") LocalDateTime endOfDay);
 
     /**
      * ✅ Added: Count notes by medecin
@@ -86,4 +90,38 @@ public interface NoteMedicaleRepository extends JpaRepository<NoteMedicale, Long
      */
     @Query("SELECT n FROM NoteMedicale n WHERE LENGTH(n.contenu) >= :minLength AND LOWER(n.contenu) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<NoteMedicale> findDetailedNotesByKeyword(@Param("keyword") String keyword, @Param("minLength") int minLength);
+
+    /**
+     * ✅ Added: Alternative today's notes query using native SQL (if needed)
+     * This can be used as a fallback if the HQL version above still has issues
+     */
+    @Query(value = "SELECT * FROM note_medicale n WHERE n.medecin_user_id = :medecinId " +
+            "AND DATE(n.date_note) = CURRENT_DATE", nativeQuery = true)
+    List<NoteMedicale> findTodayNotesByMedecinNative(@Param("medecinId") Long medecinUserId);
+
+    /**
+     * ✅ Added: Find notes created in the last N hours
+     */
+    @Query("SELECT n FROM NoteMedicale n WHERE n.medecinUserId = :medecinId " +
+            "AND n.dateNote >= :sinceTime ORDER BY n.dateNote DESC")
+    List<NoteMedicale> findRecentNotesByMedecinSince(@Param("medecinId") Long medecinUserId,
+                                                     @Param("sinceTime") LocalDateTime sinceTime);
+
+    /**
+     * ✅ Added: Find notes created this week by medecin
+     */
+    @Query("SELECT n FROM NoteMedicale n WHERE n.medecinUserId = :medecinId " +
+            "AND n.dateNote >= :startOfWeek AND n.dateNote < :endOfWeek")
+    List<NoteMedicale> findThisWeekNotesByMedecin(@Param("medecinId") Long medecinUserId,
+                                                  @Param("startOfWeek") LocalDateTime startOfWeek,
+                                                  @Param("endOfWeek") LocalDateTime endOfWeek);
+
+    /**
+     * ✅ Added: Find notes created this month by medecin
+     */
+    @Query("SELECT n FROM NoteMedicale n WHERE n.medecinUserId = :medecinId " +
+            "AND n.dateNote >= :startOfMonth AND n.dateNote < :endOfMonth")
+    List<NoteMedicale> findThisMonthNotesByMedecin(@Param("medecinId") Long medecinUserId,
+                                                   @Param("startOfMonth") LocalDateTime startOfMonth,
+                                                   @Param("endOfMonth") LocalDateTime endOfMonth);
 }

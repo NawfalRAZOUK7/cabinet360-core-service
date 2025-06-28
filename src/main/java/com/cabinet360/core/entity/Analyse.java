@@ -6,13 +6,16 @@ import java.util.Objects;
 
 /**
  * Entity representing a medical analysis associated with a patient and their dossier.
+ * ✅ FIXED: Changed table name from 'analyse' to 'medical_analyses' to avoid PostgreSQL reserved keyword conflict
  */
 @Entity
 @Table(
-        name = "analyse",
+        name = "medical_analyses", // ✅ FIXED: Changed from "analyse" (reserved keyword) to "medical_analyses"
         indexes = {
-                @Index(name = "idx_analyse_dossier", columnList = "dossier_medical_id"),
-                @Index(name = "idx_analyse_patient", columnList = "patient_user_id")
+                @Index(name = "idx_medical_analyses_dossier", columnList = "dossier_medical_id"),
+                @Index(name = "idx_medical_analyses_patient", columnList = "patient_user_id"),
+                @Index(name = "idx_medical_analyses_type", columnList = "type_analyse"),
+                @Index(name = "idx_medical_analyses_date", columnList = "date_analyse")
         }
 )
 public class Analyse {
@@ -27,7 +30,7 @@ public class Analyse {
     private String typeAnalyse;
 
     // Result of the analysis
-    @Column(length = 1000)
+    @Column(name = "resultat", length = 1000)
     private String resultat;
 
     // Date when the analysis was performed

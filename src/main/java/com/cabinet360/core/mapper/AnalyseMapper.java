@@ -6,38 +6,65 @@ import com.cabinet360.core.entity.DossierMedical;
 import org.mapstruct.*;
 
 /**
- * ✅ Fixed: Corrected mapper with proper field mappings
+ * ✅ FIXED: MapStruct mapper for Analyse entity/DTO conversion
+ * This will generate the implementation automatically and be registered as a Spring bean
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        componentModel = "spring",  // ✅ CRITICAL: This makes it a Spring bean
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface AnalyseMapper {
 
     /**
-     * ✅ Fixed: Direct field mapping, no custom mapping needed
+     * ✅ Convert entity to DTO
      */
     @Mapping(target = "dossierMedicalId", source = "dossierMedical.id")
     AnalyseDto toDto(Analyse entity);
 
     /**
-     * ✅ Fixed: Proper entity creation
+     * ✅ Convert DTO to entity
      */
-    @Mapping(target = "dossierMedical", expression = "java(createDossierMedicalReference(dto.getDossierMedicalId()))")
+    @Mapping(target = "dossierMedical", expression = "java(createDossierReference(dto.getDossierMedicalId()))")
+    @Mapping(target = "id", ignore = true) // Let database generate ID for new entities
     Analyse toEntity(AnalyseDto dto);
 
     /**
-     * ✅ Fixed: Update method with proper field mapping
+     * ✅ Update existing entity from DTO (for PUT operations)
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "dossierMedical", expression = "java(createDossierMedicalReference(dto.getDossierMedicalId()))")
+    @Mapping(target = "id", ignore = true) // Never update ID
+    @Mapping(target = "dossierMedical", expression = "java(updateDossierReference(dto.getDossierMedicalId(), entity.getDossierMedical()))")
     void updateEntityFromDto(AnalyseDto dto, @MappingTarget Analyse entity);
 
     /**
-     * ✅ Fixed: Proper reference creation (will be injected via service)
+     * ✅ Helper method to create DossierMedical reference for new entities
      */
-    default DossierMedical createDossierMedicalReference(Long dossierMedicalId) {
-        if (dossierMedicalId == null) return null;
-        DossierMedical dm = new DossierMedical();
-        dm.setId(dossierMedicalId);
-        return dm;
+    default DossierMedical createDossierReference(Long dossierMedicalId) {
+        if (dossierMedicalId == null) {
+            return null;
+        }
+        DossierMedical dossier = new DossierMedical();
+        dossier.setId(dossierMedicalId);
+        return dossier;
+    }
+
+    /**
+     * ✅ Helper method to update DossierMedical reference (only if ID changed)
+     */
+    default DossierMedical updateDossierReference(Long newDossierId, DossierMedical currentDossier) {
+        if (newDossierId == null) {
+            return currentDossier; // Keep current if no new ID provided
+        }
+
+        // If same ID, keep current reference
+        if (currentDossier != null && newDossierId.equals(currentDossier.getId())) {
+            return currentDossier;
+        }
+
+        // Create new reference if ID changed
+        DossierMedical newDossier = new DossierMedical();
+        newDossier.setId(newDossierId);
+        return newDossier;
     }
 }

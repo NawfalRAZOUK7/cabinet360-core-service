@@ -33,7 +33,7 @@ spring:
   # Configuration JPA/Hibernate
   jpa:
     hibernate:
-      ddl-auto: ${DDL_AUTO:update}
+      ddl-auto: update
 
     show-sql: ${SHOW_SQL:true}
 

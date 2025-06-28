@@ -273,13 +273,69 @@ public class NoteMedicaleService {
                 .toList();
     }
 
+    // ✅ UPDATE ONLY THIS METHOD in NoteMedicaleService.java
+
     /**
      * Gets today's notes by a doctor.
+     * ✅ FIXED: Updated to work with the corrected repository method
      */
     public List<NoteMedicaleDto> findTodayNotesByMedecin(Long medecinUserId) {
         logger.debug("Finding today's notes by doctor: {}", medecinUserId);
 
-        return noteMedicaleRepository.findTodayNotesByMedecin(medecinUserId)
+        // Calculate today's date range
+        LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        return noteMedicaleRepository.findTodayNotesByMedecin(medecinUserId, startOfDay, endOfDay)
+                .stream()
+                .map(noteMedicaleMapper::toDto)
+                .toList();
+    }
+
+// ✅ ADD THESE NEW METHODS to NoteMedicaleService.java
+
+    /**
+     * Gets notes from the last N hours.
+     */
+    public List<NoteMedicaleDto> findRecentNotesByMedecinSince(Long medecinUserId, int hours) {
+        logger.debug("Finding notes by doctor {} from last {} hours", medecinUserId, hours);
+
+        LocalDateTime sinceTime = LocalDateTime.now().minusHours(hours);
+
+        return noteMedicaleRepository.findRecentNotesByMedecinSince(medecinUserId, sinceTime)
+                .stream()
+                .map(noteMedicaleMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * Gets this week's notes by a doctor.
+     */
+    public List<NoteMedicaleDto> findThisWeekNotesByMedecin(Long medecinUserId) {
+        logger.debug("Finding this week's notes by doctor: {}", medecinUserId);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfWeek = now.toLocalDate().atStartOfDay()
+                .minusDays(now.getDayOfWeek().getValue() - 1);
+        LocalDateTime endOfWeek = startOfWeek.plusWeeks(1);
+
+        return noteMedicaleRepository.findThisWeekNotesByMedecin(medecinUserId, startOfWeek, endOfWeek)
+                .stream()
+                .map(noteMedicaleMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * Gets this month's notes by a doctor.
+     */
+    public List<NoteMedicaleDto> findThisMonthNotesByMedecin(Long medecinUserId) {
+        logger.debug("Finding this month's notes by doctor: {}", medecinUserId);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfMonth = now.toLocalDate().withDayOfMonth(1).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1);
+
+        return noteMedicaleRepository.findThisMonthNotesByMedecin(medecinUserId, startOfMonth, endOfMonth)
                 .stream()
                 .map(noteMedicaleMapper::toDto)
                 .toList();
