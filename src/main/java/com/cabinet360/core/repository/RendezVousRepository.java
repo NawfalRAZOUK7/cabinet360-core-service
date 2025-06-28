@@ -224,12 +224,12 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
                                                      @Param("endOfDay") LocalDateTime endOfDay);
 
     // ========================================
-    // CONFLICT DETECTION QUERIES
+    // CONFLICT DETECTION QUERIES (FIXED)
     // ========================================
 
     /**
-     * Vérifie s'il existe un conflit de rendez-vous pour un médecin sur une plage horaire donnée.
-     * Utilise JPQL pour détecter les chevauchements (compatible avec toutes les bases de données).
+     * ✅ FIXED: Vérifie s'il existe un conflit de rendez-vous pour un médecin sur une plage horaire donnée.
+     * Utilise une requête native PostgreSQL pour une compatibilité maximale.
      * Ne prend en compte que les rendez-vous dont le statut n'est pas ANNULE.
      *
      * @param medecinId l'ID du médecin
@@ -237,12 +237,13 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
      * @param endDateTime fin de la plage
      * @return true s'il y a conflit, false sinon
      */
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
-            "FROM RendezVous r " +
-            "WHERE r.medecinUserId = :medecinId " +
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM rendez_vous r " +
+            "WHERE r.doctor_user_id = :medecinId " +
             "AND r.statut != 'ANNULE' " +
-            "AND NOT (r.dateHeure >= :endDateTime OR " +
-            "         FUNCTION('TIMESTAMPADD', 'MINUTE', r.dureeMinutes, r.dateHeure) <= :startDateTime)")
+            "AND NOT (r.date_heure >= :endDateTime OR " +
+            "         r.date_heure + (r.duree_minutes || ' minutes')::interval <= :startDateTime)",
+            nativeQuery = true)
     boolean existsConflictingRdvMedecin(
             @Param("medecinId") Long medecinId,
             @Param("startDateTime") LocalDateTime startDateTime,
@@ -250,8 +251,8 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     );
 
     /**
-     * Vérifie s'il existe un conflit de rendez-vous pour un patient sur une plage horaire donnée.
-     * Utilise JPQL pour détecter les chevauchements (compatible avec toutes les bases de données).
+     * ✅ FIXED: Vérifie s'il existe un conflit de rendez-vous pour un patient sur une plage horaire donnée.
+     * Utilise une requête native PostgreSQL pour une compatibilité maximale.
      * Ne prend en compte que les rendez-vous dont le statut n'est pas ANNULE.
      *
      * @param patientId l'ID du patient
@@ -259,12 +260,13 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
      * @param endDateTime fin de la plage
      * @return true s'il y a conflit, false sinon
      */
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
-            "FROM RendezVous r " +
-            "WHERE r.patientUserId = :patientId " +
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM rendez_vous r " +
+            "WHERE r.patient_user_id = :patientId " +
             "AND r.statut != 'ANNULE' " +
-            "AND NOT (r.dateHeure >= :endDateTime OR " +
-            "         FUNCTION('TIMESTAMPADD', 'MINUTE', r.dureeMinutes, r.dateHeure) <= :startDateTime)")
+            "AND NOT (r.date_heure >= :endDateTime OR " +
+            "         r.date_heure + (r.duree_minutes || ' minutes')::interval <= :startDateTime)",
+            nativeQuery = true)
     boolean existsConflictingRdvPatient(
             @Param("patientId") Long patientId,
             @Param("startDateTime") LocalDateTime startDateTime,
@@ -272,7 +274,7 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     );
 
     /**
-     * Vérifie s'il existe un conflit de rendez-vous pour un médecin, en excluant un RDV spécifique.
+     * ✅ FIXED: Vérifie s'il existe un conflit de rendez-vous pour un médecin, en excluant un RDV spécifique.
      *
      * @param medecinId l'ID du médecin
      * @param startDateTime début de la plage
@@ -280,13 +282,14 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
      * @param excludeId ID du rendez-vous à exclure
      * @return true s'il y a conflit, false sinon
      */
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
-            "FROM RendezVous r " +
-            "WHERE r.medecinUserId = :medecinId " +
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM rendez_vous r " +
+            "WHERE r.doctor_user_id = :medecinId " +
             "AND r.id != :excludeId " +
             "AND r.statut != 'ANNULE' " +
-            "AND NOT (r.dateHeure >= :endDateTime OR " +
-            "         FUNCTION('TIMESTAMPADD', 'MINUTE', r.dureeMinutes, r.dateHeure) <= :startDateTime)")
+            "AND NOT (r.date_heure >= :endDateTime OR " +
+            "         r.date_heure + (r.duree_minutes || ' minutes')::interval <= :startDateTime)",
+            nativeQuery = true)
     boolean existsConflictingRdvMedecinExcluding(
             @Param("medecinId") Long medecinId,
             @Param("startDateTime") LocalDateTime startDateTime,
@@ -295,7 +298,7 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     );
 
     /**
-     * Vérifie s'il existe un conflit de rendez-vous pour un patient, en excluant un RDV spécifique.
+     * ✅ FIXED: Vérifie s'il existe un conflit de rendez-vous pour un patient, en excluant un RDV spécifique.
      *
      * @param patientId l'ID du patient
      * @param startDateTime début de la plage
@@ -303,13 +306,14 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
      * @param excludeId ID du rendez-vous à exclure
      * @return true s'il y a conflit, false sinon
      */
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
-            "FROM RendezVous r " +
-            "WHERE r.patientUserId = :patientId " +
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM rendez_vous r " +
+            "WHERE r.patient_user_id = :patientId " +
             "AND r.id != :excludeId " +
             "AND r.statut != 'ANNULE' " +
-            "AND NOT (r.dateHeure >= :endDateTime OR " +
-            "         FUNCTION('TIMESTAMPADD', 'MINUTE', r.dureeMinutes, r.dateHeure) <= :startDateTime)")
+            "AND NOT (r.date_heure >= :endDateTime OR " +
+            "         r.date_heure + (r.duree_minutes || ' minutes')::interval <= :startDateTime)",
+            nativeQuery = true)
     boolean existsConflictingRdvPatientExcluding(
             @Param("patientId") Long patientId,
             @Param("startDateTime") LocalDateTime startDateTime,
