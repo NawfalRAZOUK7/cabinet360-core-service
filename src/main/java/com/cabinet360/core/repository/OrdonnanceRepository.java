@@ -82,8 +82,12 @@ public interface OrdonnanceRepository extends JpaRepository<Ordonnance, Long> {
     List<Ordonnance> findByDossierMedicalIdAndMedecinUserId(Long dossierMedicalId, Long medecinUserId);
 
     /**
-     * ✅ Added: Find ordonnances created today by medecin
+     * ✅ FIXED: Find ordonnances created today by medecin using proper date range comparison
+     * This replaces the problematic DATE() function with a proper LocalDateTime range
      */
-    @Query("SELECT o FROM Ordonnance o WHERE o.medecinUserId = :medecinId AND DATE(o.dateOrdonnance) = CURRENT_DATE")
-    List<Ordonnance> findTodayOrdonnancesByMedecin(@Param("medecinId") Long medecinUserId);
+    @Query("SELECT o FROM Ordonnance o WHERE o.medecinUserId = :medecinId " +
+            "AND o.dateOrdonnance >= :startOfDay AND o.dateOrdonnance < :endOfDay")
+    List<Ordonnance> findTodayOrdonnancesByMedecin(@Param("medecinId") Long medecinUserId,
+                                                   @Param("startOfDay") LocalDateTime startOfDay,
+                                                   @Param("endOfDay") LocalDateTime endOfDay);
 }

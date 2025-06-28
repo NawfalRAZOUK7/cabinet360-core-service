@@ -260,11 +260,17 @@ public class OrdonnanceService {
 
     /**
      * Gets today's prescriptions by a doctor.
+     * ✅ FIXED: Updated to work with the new repository method signature
      */
     public List<OrdonnanceDto> findTodayPrescriptionsByMedecin(Long medecinUserId) {
         logger.debug("Finding today's prescriptions by doctor: {}", medecinUserId);
 
-        return ordonnanceRepository.findTodayOrdonnancesByMedecin(medecinUserId)
+        // Get today's date range (from start of day to start of next day)
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        return ordonnanceRepository.findTodayOrdonnancesByMedecin(medecinUserId, startOfDay, endOfDay)
                 .stream()
                 .map(ordonnanceMapper::toDto)
                 .toList();
